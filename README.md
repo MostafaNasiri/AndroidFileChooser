@@ -6,6 +6,30 @@
 ```
 compile 'ir.sohreco.androidfilechooser:android-file-chooser:1.1.0'
 ```
+<h2>About Android Version 6 And Above</h2>
+<p>As you probably know, Android 6 introduced a new permission system which grants user permission at runtime about certain actions including reading files from local storage so you should check whether your app has permission to access user files.</p>
+<p>You can check and request permission like this:</p>
+```
+int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+} else {
+    // Your app already has the permission to access files and folders
+    // so you can simply open FileChooser here.
+}
+```
+<p>And you should override onRequestPermissionsResult in your activity:</p>
+```
+@Override
+public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (requestCode == PERMISSION_REQUEST_CODE) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permission granted.
+        }
+    }
+}
+```
 <h2>New Features In Version 1.1.0</h2>
 You can now set:
   <ul>
@@ -16,7 +40,7 @@ You can now set:
     <li>Select Directory Button's Background</li>
   </ul>
 <h2>How to Use</h2>
-If you want the default look for your file/directory chooser you can simply implement FileChooserDialog.ChooserListener in your class and create an instance of FileChooserDialog.Builder and then show the dialog:</p>
+<p>If you want the default look for your file/directory chooser you can simply implement FileChooserDialog.ChooserListener in your class and create an instance of FileChooserDialog.Builder and then show the dialog:</p>
 ```java
 FileChooserDialog.Builder builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, this);
 ```
