@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="@dimen/activity_horizontal_margin"
+                tools:context=".FileChooserDialog"
+                tools:ignore="RtlHardcoded">
+
+    <Button
+        android:id="@+id/previous_dir_imagebutton"
+        android:layout_width="@dimen/prev_dir_width"
+        android:layout_height="@dimen/prev_dir_width"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/current_dir_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/items_recyclerview"
+        android:layout_marginLeft="@dimen/current_dir_left_margin"
+        android:layout_toRightOf="@id/previous_dir_imagebutton"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/items_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/select_dir_button"
+        android:layout_below="@+id/previous_dir_imagebutton"
+        android:layout_marginTop="@dimen/items_list_top_margin"/>
+
+    <Button
+        android:id="@+id/select_dir_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/select_dir"
+        android:visibility="gone"/>
+
+</RelativeLayout>

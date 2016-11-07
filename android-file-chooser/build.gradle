@@ -1,0 +1,52 @@
+apply plugin: 'com.android.library'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'android-file-chooser'
+
+    publishedGroupId = 'ir.sohreco.androidfilechooser'
+    libraryName = 'android-file-chooser'
+    artifact = 'android-file-chooser'
+
+    libraryDescription = 'A customizable file/directory chooser for Android.'
+
+    siteUrl = 'https://github.com/MostafaNasiri/AndroidFileChooser'
+    gitUrl = 'https://github.com/MostafaNasiri/AndroidFileChooser'
+
+    libraryVersion = '1.1.0'
+
+    developerId = 'mostafanasiri'
+    developerName = 'Mostafa Nasiri'
+    developerEmail = 'm.nasiri13@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 2
+        versionName "1.1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:recyclerview-v7:25.0.0'
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
