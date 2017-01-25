@@ -1,4 +1,4 @@
-package ir.sohreco.androidfilechooser;
+package ir.sohreco.androidfilechooser.sample;
 
 import org.junit.Test;
 
