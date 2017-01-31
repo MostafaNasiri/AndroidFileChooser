@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -40,7 +39,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     private final static String KEY_DIRECTORY_ICON_ID = "directoryIconId";
     private final static String KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID = "previousDirectoryButtonIconId";
 
-    public interface ChooserListener extends Serializable {
+    public interface ChooserListener {
         /**
          * This method gets called when user selects a file or a directory depending on the chooser type.
          *
@@ -223,7 +222,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
 
             Bundle args = new Bundle();
             args.putSerializable(KEY_CHOOSER_TYPE, chooserType);
-            args.putSerializable(KEY_CHOOSER_LISTENER, chooserListener);
+            fragment.chooserListener = chooserListener;
             args.putString(KEY_TITLE, title);
             args.putStringArray(KEY_FILE_FORMATS, fileFormats);
             args.putString(KEY_INITIAL_DIRECTORY, initialDirectory);
@@ -360,7 +359,6 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     private void getGivenArguments() {
         Bundle args = getArguments();
         chooserType = (ChooserType) args.getSerializable(KEY_CHOOSER_TYPE);
-        chooserListener = (ChooserListener) args.getSerializable(KEY_CHOOSER_LISTENER);
         title = args.getString(KEY_TITLE);
         fileFormats = args.getStringArray(KEY_FILE_FORMATS);
         initialDirectory = args.getString(KEY_INITIAL_DIRECTORY);
