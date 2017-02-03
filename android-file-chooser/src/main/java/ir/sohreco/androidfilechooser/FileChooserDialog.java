@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +30,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     private final static String KEY_CHOOSER_LISTENER = "chooserListener";
     private final static String KEY_TITLE = "title";
     private final static String KEY_FILE_FORMATS = "fileFormats";
+    private final static String KEY_MULTIPLE_FILE_SELECTION_ENABLED = "multipleFileSelectionEnabled";
     private final static String KEY_INITIAL_DIRECTORY = "initialDirectory";
     private final static String KEY_SELECT_DIRECTORY_BUTTON_TEXT = "selectDirectoryButtonText";
     private final static String KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE = "selectDirectoryButtonTextSize";
@@ -61,6 +61,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
 
         // Optional parameters
         private String[] fileFormats;
+        private boolean multipleFileSelectionEnabled;
         private String title, selectDirectoryButtonText, initialDirectory;
         @DrawableRes
         private int fileIconId = R.drawable.ic_file;
@@ -73,6 +74,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         @ColorRes
         private int selectDirectoryButtonTextColorId;
         private float selectDirectoryButtonTextSize;
+
 
         /**
          * Creates a builder for a FileChooser fragment.
@@ -103,6 +105,16 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
          */
         public Builder setFileFormats(String[] fileFormats) {
             this.fileFormats = fileFormats;
+            return this;
+        }
+
+        /**
+         * Set whether multiple file selection should be enabled or not.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         */
+        public Builder setMultipleFileSelectionEnabled(boolean enabled) {
+            this.multipleFileSelectionEnabled = enabled;
             return this;
         }
 
@@ -226,6 +238,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
             args.putSerializable(KEY_CHOOSER_LISTENER, chooserListener);
             args.putString(KEY_TITLE, title);
             args.putStringArray(KEY_FILE_FORMATS, fileFormats);
+            args.putBoolean(KEY_MULTIPLE_FILE_SELECTION_ENABLED, multipleFileSelectionEnabled);
             args.putString(KEY_INITIAL_DIRECTORY, initialDirectory);
             args.putString(KEY_SELECT_DIRECTORY_BUTTON_TEXT, selectDirectoryButtonText);
             args.putFloat(KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE, selectDirectoryButtonTextSize);
@@ -248,6 +261,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     private ChooserListener chooserListener;
     private ItemsAdapter itemsAdapter;
     private String[] fileFormats;
+    private boolean multipleFileSelectionEnabled;
     private String currentDirectoryPath, title, initialDirectory, selectDirectoryButtonText;
     @DrawableRes
     private int directoryIconId, fileIconId, previousDirectoryButtonIconId, selectDirectoryButtonBackgroundId;
@@ -277,16 +291,19 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         if (chooserType == ChooserType.DIRECTORY_CHOOSER) {
             btnSelectDirectory.setVisibility(View.VISIBLE);
             btnSelectDirectory.setText(selectDirectoryButtonText);
+
             if (selectDirectoryButtonBackgroundId != 0)
                 btnSelectDirectory.setBackgroundResource(selectDirectoryButtonBackgroundId);
+
             if (selectDirectoryButtonTextColorId != 0)
                 btnSelectDirectory.setTextColor(getResources().getColor(selectDirectoryButtonTextColorId));
+
             if (selectDirectoryButtonTextSize > 0)
                 btnSelectDirectory.setTextSize(selectDirectoryButtonTextSize);
         }
         btnPrevDirectory.setBackgroundResource(previousDirectoryButtonIconId);
 
-        itemsAdapter = new ItemsAdapter(this);
+        itemsAdapter = new ItemsAdapter(this, multipleFileSelectionEnabled);
         rvItems.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvItems.setAdapter(itemsAdapter);
 
@@ -363,6 +380,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         chooserListener = (ChooserListener) args.getSerializable(KEY_CHOOSER_LISTENER);
         title = args.getString(KEY_TITLE);
         fileFormats = args.getStringArray(KEY_FILE_FORMATS);
+        multipleFileSelectionEnabled = args.getBoolean(KEY_MULTIPLE_FILE_SELECTION_ENABLED);
         initialDirectory = args.getString(KEY_INITIAL_DIRECTORY);
         selectDirectoryButtonText = args.getString(KEY_SELECT_DIRECTORY_BUTTON_TEXT);
         selectDirectoryButtonTextSize = args.getFloat(KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE);

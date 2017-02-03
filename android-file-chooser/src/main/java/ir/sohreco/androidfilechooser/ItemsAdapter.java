@@ -8,15 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
-    private List<Item> items;
+    private List<Item> items, selectedItems;
     private ItemHolder.OnItemClickListener itemClickListener;
+    private boolean multipleFileSelectionEnabled;
 
-    public ItemsAdapter(ItemHolder.OnItemClickListener itemClickListener) {
+    ItemsAdapter(ItemHolder.OnItemClickListener itemClickListener, boolean multipleFileSelectionEnabled) {
         this.itemClickListener = itemClickListener;
         items = new ArrayList<>();
+        this.multipleFileSelectionEnabled = multipleFileSelectionEnabled;
+        if (multipleFileSelectionEnabled) {
+            selectedItems = new ArrayList<>();
+        }
     }
 
-    public void setItems(List<Item> items) {
+    void setItems(List<Item> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -29,7 +34,12 @@ class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
 
     @Override
     public void onBindViewHolder(ItemHolder holder, int position) {
-        holder.bind(items.get(position));
+        Item item = items.get(position);
+        if (item.isFile() && multipleFileSelectionEnabled) {
+            holder.bind(items.get(position), selectedItems);
+        } else {
+            holder.bind(items.get(position));
+        }
     }
 
     @Override

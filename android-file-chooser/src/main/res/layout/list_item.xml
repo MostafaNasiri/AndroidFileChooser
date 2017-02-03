@@ -6,12 +6,20 @@
                 android:padding="@dimen/list_item_padding"
                 tools:ignore="RtlHardcoded">
 
+    <CheckBox
+        android:id="@+id/file_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+
     <ImageView
         android:id="@+id/item_icon_imageview"
         android:layout_width="@dimen/list_item_icon_width"
         android:layout_height="@dimen/list_item_icon_width"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/file_checkbox"/>
 
     <TextView
         android:id="@+id/item_name_textview"
