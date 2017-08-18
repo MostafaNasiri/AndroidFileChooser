@@ -12,18 +12,18 @@ import java.io.File;
 import java.io.IOException;
 
 @RunWith(JUnit4.class)
-public class FileChooserDialogBuilderTest {
+public class FileChooserBuilderTest {
     @Rule
     public final TemporaryFolder testFolder = new TemporaryFolder();
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    private FileChooserDialog.Builder builder;
-    private static FileChooserDialog.ChooserListener dummyChooserListener;
+    private FileChooser.Builder builder;
+    private static FileChooser.ChooserListener dummyChooserListener;
 
     @BeforeClass
     public static void setupDummyChooserListener() {
-        dummyChooserListener = new FileChooserDialog.ChooserListener() {
+        dummyChooserListener = new FileChooser.ChooserListener() {
             @Override
             public void onSelect(String path) {
 
@@ -36,7 +36,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("chooserType can not be null.");
 
-        builder = new FileChooserDialog.Builder(null, dummyChooserListener);
+        builder = new FileChooser.Builder(null, dummyChooserListener);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("chooserListener can not be null.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, null);
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, null);
     }
 
     /**
@@ -56,7 +56,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set file formats when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setFileFormats(new String[]{".png"});
     }
 
@@ -65,7 +65,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("File formats can't be null. If you want all types of files to be shown, simply don't set this parameter.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setFileFormats(null);
     }
 
@@ -74,7 +74,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("File formats can't be empty. If you want all types of files to be shown, simply don't set this parameter.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setFileFormats(new String[]{});
     }
 
@@ -83,7 +83,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Multiple file selection can't be enabled when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setMultipleFileSelectionEnabled(true);
     }
 
@@ -96,7 +96,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("initialDirectory can't be null.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setInitialDirectory(null);
     }
 
@@ -108,7 +108,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(nonExistingDirectory.getPath() + " Does not exist.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setInitialDirectory(nonExistingDirectory);
     }
 
@@ -119,7 +119,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(file.getPath() + " Is not a directory.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setInitialDirectory(file);
     }
 
@@ -132,7 +132,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select multiple files button's text when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonText("SELECT FILES");
     }
 
@@ -141,7 +141,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select multiple files button's text size when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonTextSize(25);
     }
 
@@ -150,7 +150,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("textSize can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonTextSize(0);
     }
 
@@ -159,7 +159,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select multiple files button's text color when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonTextColor(android.R.color.background_dark);
     }
 
@@ -168,7 +168,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("colorId can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonTextColor(-1);
     }
 
@@ -177,7 +177,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select multiple files button's background when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonBackground(android.R.drawable.checkbox_off_background);
     }
 
@@ -186,7 +186,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("backgroundId can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectMultipleFilesButtonBackground(0);
     }
 
@@ -198,7 +198,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select directory button's text when chooser type is FILE_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectDirectoryButtonText("");
     }
 
@@ -207,7 +207,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select directory button's text size when chooser type is FILE_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectDirectoryButtonTextSize(20);
     }
 
@@ -216,7 +216,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("textSize can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setSelectDirectoryButtonTextSize(-10);
     }
 
@@ -225,7 +225,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select directory button's text color when chooser type is FILE_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectDirectoryButtonTextColor(android.R.color.background_dark);
     }
 
@@ -234,7 +234,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("colorId can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setSelectDirectoryButtonTextColor(0);
     }
 
@@ -243,7 +243,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set select directory button's background when chooser type is FILE_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setSelectDirectoryButtonBackground(android.R.drawable.checkbox_off_background);
     }
 
@@ -252,7 +252,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage("Can't set file icon when chooser type is DIRECTORY_CHOOSER.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.DIRECTORY_CHOOSER, dummyChooserListener)
                 .setFileIcon(android.R.drawable.btn_default);
     }
 
@@ -261,7 +261,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("iconId can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setFileIcon(-1);
     }
 
@@ -270,7 +270,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("iconId can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setDirectoryIcon(0);
     }
 
@@ -279,7 +279,7 @@ public class FileChooserDialogBuilderTest {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("conId can't be less than or equal to zero.");
 
-        builder = new FileChooserDialog.Builder(FileChooserDialog.ChooserType.FILE_CHOOSER, dummyChooserListener)
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, dummyChooserListener)
                 .setPreviousDirectoryButtonIcon(0);
     }
 }

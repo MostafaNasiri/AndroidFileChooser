@@ -42,6 +42,14 @@ class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
         }
     }
 
+    String getSelectedItems() {
+        StringBuilder builder = new StringBuilder();
+        for (Item i : selectedItems) {
+            builder.append(i.getPath()).append(FileChooser.FILE_NAMES_SEPARATOR);
+        }
+        return builder.toString();
+    }
+
     @Override
     public int getItemCount() {
         return items.size();

@@ -7,9 +7,8 @@ import android.os.Environment;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,10 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FileChooserDialog extends AppCompatDialogFragment implements ItemHolder.OnItemClickListener, View.OnClickListener {
+public class FileChooser extends Fragment
+        implements ItemHolder.OnItemClickListener, View.OnClickListener {
+    public final static String FILE_NAMES_SEPARATOR = ":";
+
     private final static String KEY_CHOOSER_TYPE = "chooserType";
-    private final static String KEY_CHOOSER_LISTENER = "chooserListener";
-    private final static String KEY_TITLE = "title";
     private final static String KEY_FILE_FORMATS = "fileFormats";
     private final static String KEY_MULTIPLE_FILE_SELECTION_ENABLED = "multipleFileSelectionEnabled";
     private final static String KEY_INITIAL_DIRECTORY = "initialDirectory";
@@ -40,7 +40,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     private final static String KEY_DIRECTORY_ICON_ID = "directoryIconId";
     private final static String KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID = "previousDirectoryButtonIconId";
 
-    public interface ChooserListener {
+    public interface ChooserListener extends Serializable {
         /**
          * This method gets called when user selects a file or a directory depending on the chooser type.
          *
@@ -62,7 +62,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         // Optional parameters
         private String[] fileFormats;
         private boolean multipleFileSelectionEnabled;
-        private String title, selectDirectoryButtonText, initialDirectory;
+        private String selectDirectoryButtonText, initialDirectory;
         @DrawableRes
         private int fileIconId = R.drawable.ic_file;
         @DrawableRes
@@ -75,35 +75,40 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         private int selectDirectoryButtonTextColorId;
         private float selectDirectoryButtonTextSize;
 
-
         /**
          * Creates a builder for a FileChooser fragment.
          *
          * @param chooserType You can choose to create either a FileChooser or a DirectoryChooser
          */
         public Builder(ChooserType chooserType, ChooserListener chooserListener) {
+            if (chooserType == null)
+                throw new IllegalArgumentException("chooserType can not be null.");
+
+            if (chooserListener == null)
+                throw new IllegalArgumentException("chooserListener can not be null.");
+
             this.chooserType = chooserType;
             this.chooserListener = chooserListener;
         }
 
         /**
-         * Set the title of this FileChooserDialog.
-         *
-         * @return This Builder object to allow for chaining of calls to set methods
-         */
-        public Builder setTitle(String title) {
-            this.title = title;
-            return this;
-        }
-
-        /**
-         * Set file formats which are going to be shown by this FileChooserDialog.
+         * Set file formats which are going to be shown by this FileChooser.
          * All types of files will be shown if you don't set it.
          *
          * @param fileFormats A string array of file formats
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalArgumentException if fileFormats is null or if it doesn't have any elements
          */
         public Builder setFileFormats(String[] fileFormats) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Can't set file formats when chooser type is DIRECTORY_CHOOSER.");
+
+            if (fileFormats == null)
+                throw new IllegalArgumentException("File formats can't be null. If you want all types of files to be shown, simply don't set this parameter.");
+
+            if (fileFormats.length == 0)
+                throw new IllegalArgumentException("File formats can't be empty. If you want all types of files to be shown, simply don't set this parameter.");
+
             this.fileFormats = fileFormats;
             return this;
         }
@@ -112,24 +117,29 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
          * Set whether multiple file selection should be enabled or not.
          *
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
          */
         public Builder setMultipleFileSelectionEnabled(boolean enabled) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Multiple file selection can't be enabled when chooser type is DIRECTORY_CHOOSER.");
+
             this.multipleFileSelectionEnabled = enabled;
             return this;
         }
 
         /**
-         * Set the initial directory of this FileChooserDialog.
+         * Set the initial directory of this FileChooser.
          *
          * @return This Builder object to allow for chaining of calls to set methods
          * @throws IllegalArgumentException if:<br>
+         *                                  initialDirectory is null.<br>
          *                                  initialDirectory does not exist.<br>
          *                                  initialDirectory is not a directory.<br>
          *                                  initialDirectory is not accessible due to access restrictions.
          */
         public Builder setInitialDirectory(File initialDirectory) {
             if (initialDirectory == null)
-                throw new NullPointerException("initialDirectory can't be null.");
+                throw new IllegalArgumentException("initialDirectory can't be null.");
 
             if (!initialDirectory.exists())
                 throw new IllegalArgumentException(initialDirectory.getPath() + " Does not exist.");
@@ -145,12 +155,80 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         }
 
         /**
+         * Set select files button's text. You will see this button when chooser type is FILE_CHOOSER with multiple file selection enabled.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
+         */
+        public Builder setSelectMultipleFilesButtonText(String text) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Can't set select multiple files button's text when chooser type is DIRECTORY_CHOOSER.");
+            selectDirectoryButtonText = text;
+            return this;
+        }
+
+        /**
+         * Set select files button's text size. You will see this button when chooser type is FILE_CHOOSER with multiple file selection enabled.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
+         */
+        public Builder setSelectMultipleFilesButtonTextSize(float textSize) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Can't set select multiple files button's text size when chooser type is DIRECTORY_CHOOSER.");
+
+            if (textSize <= 0)
+                throw new IllegalArgumentException("textSize can't be less than or equal to zero.");
+
+            selectDirectoryButtonTextSize = textSize;
+            return this;
+        }
+
+        /**
+         * Set select files button's text color. You will see this button when chooser type is FILE_CHOOSER with multiple file selection enabled.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
+         */
+        public Builder setSelectMultipleFilesButtonTextColor(@ColorRes int colorId) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Can't set select multiple files button's text color when chooser type is DIRECTORY_CHOOSER.");
+
+            if (colorId <= 0)
+                throw new IllegalArgumentException("colorId can't be less than or equal to zero.");
+
+            selectDirectoryButtonTextColorId = colorId;
+            return this;
+        }
+
+        /**
+         * Set select files button's background. You will see this button when chooser type is FILE_CHOOSER with multiple file selection enabled.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
+         */
+        public Builder setSelectMultipleFilesButtonBackground(@DrawableRes int backgroundId) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Can't set select multiple files button's background when chooser type is DIRECTORY_CHOOSER.");
+
+            if (backgroundId <= 0)
+                throw new IllegalArgumentException("backgroundId can't be less than or equal to zero.");
+
+            selectDirectoryButtonBackgroundId = backgroundId;
+            return this;
+        }
+
+        /**
          * Set select directory button's text. You will see this button when chooser type is DIRECTORY_CHOOSER.
          *
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is FILE_CHOOSER
          */
         public Builder setSelectDirectoryButtonText(String text) {
-            this.selectDirectoryButtonText = text;
+            if (chooserType == ChooserType.FILE_CHOOSER)
+                throw new IllegalStateException("Can't set select directory button's text when chooser type is FILE_CHOOSER.");
+
+            selectDirectoryButtonText = text;
             return this;
         }
 
@@ -159,8 +237,15 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
          *
          * @param textSize must be based on scaled pixel(SP) unit.
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is FILE_CHOOSER
          */
         public Builder setSelectDirectoryButtonTextSize(float textSize) {
+            if (chooserType == ChooserType.FILE_CHOOSER)
+                throw new IllegalStateException("Can't set select directory button's text size when chooser type is FILE_CHOOSER.");
+
+            if (textSize <= 0)
+                throw new IllegalArgumentException("textSize can't be less than or equal to zero.");
+
             selectDirectoryButtonTextSize = textSize;
             return this;
         }
@@ -169,8 +254,15 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
          * Set select directory button's text color. You will see this button when chooser type is DIRECTORY_CHOOSER.
          *
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is FILE_CHOOSER
          */
         public Builder setSelectDirectoryButtonTextColor(@ColorRes int colorId) {
+            if (chooserType == ChooserType.FILE_CHOOSER)
+                throw new IllegalStateException("Can't set select directory button's text color when chooser type is FILE_CHOOSER.");
+
+            if (colorId <= 0)
+                throw new IllegalArgumentException("colorId can't be less than or equal to zero.");
+
             selectDirectoryButtonTextColorId = colorId;
             return this;
         }
@@ -179,30 +271,47 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
          * Set select directory button's background. You will see this button when chooser type is DIRECTORY_CHOOSER.
          *
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is FILE_CHOOSER
          */
         public Builder setSelectDirectoryButtonBackground(@DrawableRes int backgroundId) {
+            if (chooserType == ChooserType.FILE_CHOOSER)
+                throw new IllegalStateException("Can't set select directory button's background when chooser type is FILE_CHOOSER.");
+
+            if (backgroundId <= 0)
+                throw new IllegalArgumentException("backgroundId can't be less than or equal to zero.");
+
             selectDirectoryButtonBackgroundId = backgroundId;
             return this;
         }
 
         /**
-         * Set the icon for files in this FileChooserDialog's list
+         * Set the icon for files in this FileChooser's list
          * Default icon will be used if you don't set it.
          *
          * @return This Builder object to allow for chaining of calls to set methods
+         * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
          */
         public Builder setFileIcon(@DrawableRes int iconId) {
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER)
+                throw new IllegalStateException("Can't set file icon when chooser type is DIRECTORY_CHOOSER.");
+
+            if (iconId <= 0)
+                throw new IllegalArgumentException("iconId can't be less than or equal to zero.");
+
             fileIconId = iconId;
             return this;
         }
 
         /**
-         * Set the icon for directories in this FileChooserDialog's list.
+         * Set the icon for directories in this FileChooser's list.
          * Default icon will be used if you don't set it.
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
         public Builder setDirectoryIcon(@DrawableRes int iconId) {
+            if (iconId <= 0)
+                throw new IllegalArgumentException("iconId can't be less than or equal to zero.");
+
             directoryIconId = iconId;
             return this;
         }
@@ -214,16 +323,19 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
          * @return This Builder object to allow for chaining of calls to set methods
          */
         public Builder setPreviousDirectoryButtonIcon(@DrawableRes int iconId) {
+            if (iconId <= 0)
+                throw new IllegalArgumentException("iconId can't be less than or equal to zero.");
+
             previousDirectoryButtonIcon = iconId;
             return this;
         }
 
         /**
-         * Returns an instance of FileChooserDialog with the given configurations.
+         * Returns an instance of FileChooser with the given configurations.
          *
          * @throws ExternalStorageNotAvailableException If there is no external storage available on user's device
          */
-        public FileChooserDialog build() throws ExternalStorageNotAvailableException {
+        public FileChooser build() throws ExternalStorageNotAvailableException {
             String externalStorageState = Environment.getExternalStorageState();
             boolean externalStorageAvailable = externalStorageState.equals(Environment.MEDIA_MOUNTED)
                     || externalStorageState.equals(Environment.MEDIA_MOUNTED_READ_ONLY);
@@ -231,12 +343,11 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
                 throw new ExternalStorageNotAvailableException();
             }
 
-            FileChooserDialog fragment = new FileChooserDialog();
+            FileChooser fragment = new FileChooser();
 
             Bundle args = new Bundle();
             args.putSerializable(KEY_CHOOSER_TYPE, chooserType);
             fragment.chooserListener = chooserListener;
-            args.putString(KEY_TITLE, title);
             args.putStringArray(KEY_FILE_FORMATS, fileFormats);
             args.putBoolean(KEY_MULTIPLE_FILE_SELECTION_ENABLED, multipleFileSelectionEnabled);
             args.putString(KEY_INITIAL_DIRECTORY, initialDirectory);
@@ -249,7 +360,6 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
             args.putInt(KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID, previousDirectoryButtonIcon);
 
             fragment.setArguments(args);
-
             return fragment;
         }
     }
@@ -273,32 +383,26 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getGivenArguments();
-        if (title == null) {
-            // Remove dialog's title
-            // Since setting the style after the fragment is created doesn't have any effect
-            // so we have to decide about dialog's title here.
-            setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chooser, container, false);
+        View view = inflater.inflate(R.layout.fragment_file_chooser, container, false);
         findViews(view);
         setListeners();
-        getDialog().setTitle(title);
 
-        if (chooserType == ChooserType.DIRECTORY_CHOOSER) {
+        // When multiple file selection is enabled, we use the select directory button to let the user
+        // finish the file selection process.
+        // So select directory button must be available in both situations.
+        if (chooserType == ChooserType.DIRECTORY_CHOOSER || multipleFileSelectionEnabled) {
             btnSelectDirectory.setVisibility(View.VISIBLE);
             btnSelectDirectory.setText(selectDirectoryButtonText);
-
             if (selectDirectoryButtonBackgroundId != 0)
                 btnSelectDirectory.setBackgroundResource(selectDirectoryButtonBackgroundId);
-
             if (selectDirectoryButtonTextColorId != 0)
-                btnSelectDirectory.setTextColor(getResources().getColor(selectDirectoryButtonTextColorId));
-
-            if (selectDirectoryButtonTextSize > 0)
+                btnSelectDirectory.setTextColor(ContextCompat.getColor(getContext(),
+                        selectDirectoryButtonTextColorId));
+            if (selectDirectoryButtonTextSize != 0)
                 btnSelectDirectory.setTextSize(selectDirectoryButtonTextSize);
         }
         btnPrevDirectory.setBackgroundResource(previousDirectoryButtonIconId);
@@ -307,7 +411,8 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         rvItems.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvItems.setAdapter(itemsAdapter);
 
-        loadItems(initialDirectory != null ? initialDirectory : Environment.getExternalStorageDirectory().getPath());
+        loadItems(initialDirectory != null ? initialDirectory :
+                Environment.getExternalStorageDirectory().getPath());
 
         return view;
     }
@@ -318,7 +423,6 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
             loadItems(item.getPath());
         } else {
             chooserListener.onSelect(item.getPath());
-            dismiss();
         }
     }
 
@@ -331,8 +435,12 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
                 loadItems(parent.getPath());
             }
         } else if (id == R.id.select_dir_button) {
-            chooserListener.onSelect(currentDirectoryPath);
-            dismiss();
+            if (chooserType == ChooserType.DIRECTORY_CHOOSER) {
+                chooserListener.onSelect(currentDirectoryPath);
+            } else if (multipleFileSelectionEnabled) {
+                // Now select directory button acts as select files button.
+                chooserListener.onSelect(itemsAdapter.getSelectedItems());
+            }
         }
     }
 
@@ -347,7 +455,7 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
             public boolean accept(File file) {
                 if (file.canRead()) {
                     if (chooserType == ChooserType.FILE_CHOOSER && file.isFile()) {
-                        if (fileFormats != null && fileFormats.length > 0) {
+                        if (fileFormats != null) {
                             for (String fileFormat : fileFormats) {
                                 if (file.getName().endsWith(fileFormat)) {
                                     return true;
@@ -366,7 +474,8 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
         List<Item> items = new ArrayList<>();
         for (File f : files) {
             int drawableId = f.isFile() ? fileIconId : directoryIconId;
-            Drawable drawable = ContextCompat.getDrawable(getActivity().getApplicationContext(), drawableId);
+            Drawable drawable = ContextCompat.getDrawable(getActivity().getApplicationContext(),
+                    drawableId);
             items.add(new Item(f.getPath(), drawable));
         }
         Collections.sort(items);
@@ -376,15 +485,17 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
 
     private void getGivenArguments() {
         Bundle args = getArguments();
+
         chooserType = (ChooserType) args.getSerializable(KEY_CHOOSER_TYPE);
-        title = args.getString(KEY_TITLE);
         fileFormats = args.getStringArray(KEY_FILE_FORMATS);
         multipleFileSelectionEnabled = args.getBoolean(KEY_MULTIPLE_FILE_SELECTION_ENABLED);
         initialDirectory = args.getString(KEY_INITIAL_DIRECTORY);
+
         selectDirectoryButtonText = args.getString(KEY_SELECT_DIRECTORY_BUTTON_TEXT);
         selectDirectoryButtonTextSize = args.getFloat(KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE);
         selectDirectoryButtonTextColorId = args.getInt(KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_ID);
         selectDirectoryButtonBackgroundId = args.getInt(KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_ID);
+
         fileIconId = args.getInt(KEY_FILE_ICON_ID);
         directoryIconId = args.getInt(KEY_DIRECTORY_ICON_ID);
         previousDirectoryButtonIconId = args.getInt(KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID);
@@ -396,9 +507,9 @@ public class FileChooserDialog extends AppCompatDialogFragment implements ItemHo
     }
 
     private void findViews(View v) {
-        rvItems = (RecyclerView) v.findViewById(R.id.items_recyclerview);
-        btnPrevDirectory = (Button) v.findViewById(R.id.previous_dir_imagebutton);
-        btnSelectDirectory = (Button) v.findViewById(R.id.select_dir_button);
-        tvCurrentDirectory = (TextView) v.findViewById(R.id.current_dir_textview);
+        rvItems = v.findViewById(R.id.items_recyclerview);
+        btnPrevDirectory = v.findViewById(R.id.previous_dir_imagebutton);
+        btnSelectDirectory = v.findViewById(R.id.select_dir_button);
+        tvCurrentDirectory = v.findViewById(R.id.current_dir_textview);
     }
 }

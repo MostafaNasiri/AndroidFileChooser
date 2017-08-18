@@ -3,6 +3,7 @@ package ir.sohreco.androidfilechooser;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,7 +21,6 @@ class ItemHolder extends RecyclerView.ViewHolder {
 
     ItemHolder(View itemView, OnItemClickListener itemClickListener) {
         super(itemView);
-
         this.itemClickListener = itemClickListener;
 
         ivItemIcon = (ImageView) itemView.findViewById(R.id.item_icon_imageview);
@@ -29,8 +29,10 @@ class ItemHolder extends RecyclerView.ViewHolder {
     }
 
     void bind(final Item item) {
+        cbFile.setVisibility(View.GONE);
         tvItemName.setText(item.getName());
         ivItemIcon.setImageDrawable(item.getIcon());
+
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,23 +41,30 @@ class ItemHolder extends RecyclerView.ViewHolder {
         });
     }
 
+    // This method only gets called when chooser type is FILE_CHOOSER with multiple file selection enabled.
     void bind(final Item item, final List<Item> selectedItems) {
+        cbFile.setVisibility(View.VISIBLE);
         tvItemName.setText(item.getName());
         ivItemIcon.setImageDrawable(item.getIcon());
-        cbFile.setVisibility(View.VISIBLE);
-        View.OnClickListener onClickListener = new View.OnClickListener() {
+
+        cbFile.setOnCheckedChangeListener(null); // This line prevents unexpected behavior
+        cbFile.setChecked(selectedItems.contains(item));
+        cbFile.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                if (cbFile.isChecked()) {
-                    selectedItems.remove(item);
-                    cbFile.setChecked(false);
-                } else {
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
                     selectedItems.add(item);
-                    cbFile.setChecked(true);
+                } else {
+                    selectedItems.remove(item);
                 }
             }
-        };
-        cbFile.setOnClickListener(onClickListener);
-        itemView.setOnClickListener(onClickListener);
+        });
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cbFile.performClick();
+            }
+        });
     }
 }

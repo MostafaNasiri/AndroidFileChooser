@@ -8,12 +8,12 @@ import java.io.File;
 class Item extends File implements Comparable<File> {
     private Drawable icon;
 
-    public Item(String path, Drawable icon) {
+    Item(String path, Drawable icon) {
         super(path);
         this.icon = icon;
     }
 
-    public Drawable getIcon() {
+    Drawable getIcon() {
         return icon;
     }
 
