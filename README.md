@@ -1,10 +1,11 @@
-<h1>Android File Chooser</h1>
+<h1>AndroidFileChooser</h1>
+
+<p align="center">
+<img src="https://github.com/MostafaNasiri/AndroidFileChooser/blob/master/AndroidFileChooser.png" />
+</p>
+
 <p>Android File Chooser is a simple and customizable file/directory chooser dialog which you can use in your apps to let your users select a file or directory based on your needs.</p>
-<h2>Changes in Version 1.2</h2>
-<ul>
-<li>Multiple file selection is now possible.</li>
-<li>Fixed a bug related to serialization (Thanks to @ShamilovSV)</li>
-</ul>
+
 <h2>How to Add the Library</h2>
 <p>This library is availabe in the jcenter repository. Simply add this line of code in your dependencies:</p>
 
@@ -46,9 +47,8 @@ FileChooserDialog.Builder builder = new FileChooserDialog.Builder(FileChooserDia
                 .setSelectMultipleFilesButtonText("Select Files");
 ```
 
-<h2>About Android Version 6 And Above</h2>
-<p>As you probably know, Android 6 introduced a new permission system which grants user permission at runtime about certain actions including reading files from local storage so you should check whether your app has permission to access user files.</p>
-<p>You can check and request permission like this:</p>
+<h2>On Android Version 6 And Above</h2>
+<p>You should grant READ_EXTERNAL_STORAGE permission:</p>
 
 ```java
 int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -59,8 +59,6 @@ if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
     // so you can simply open FileChooser here.
 }
 ```
-
-<p>And you should override onRequestPermissionsResult in your activity:</p>
 
 ```java
 @Override
