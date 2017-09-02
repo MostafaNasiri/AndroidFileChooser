@@ -4,7 +4,7 @@
 <img src="https://github.com/MostafaNasiri/AndroidFileChooser/blob/master/AndroidFileChooser.png" />
 </p>
 
-<p>Android File Chooser is a simple and customizable file/directory chooser dialog which you can use in your apps to let your users select a file or directory based on your needs.</p>
+<p>Android File Chooser is a simple and customizable file/directory chooser fragment which you can use in your apps to let your users select a file or directory based on your needs.</p>
 
 <h2>How to Add the Library</h2>
 <p>This library is availabe in the jcenter repository. Simply add this line of code in your dependencies:</p>
