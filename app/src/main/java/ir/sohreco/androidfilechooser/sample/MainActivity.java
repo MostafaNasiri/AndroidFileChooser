@@ -49,12 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 new FileChooser.ChooserListener() {
                     @Override
                     public void onSelect(String path) {
-                        String[] selectedFilesPaths = path.split(FileChooser.FILE_NAMES_SEPARATOR);
-                        // Do whatever you want to do with selected files
+                        Toast.makeText(MainActivity.this, path, Toast.LENGTH_SHORT).show();
                     }
-                })
-                .setMultipleFileSelectionEnabled(true)
-                .setSelectMultipleFilesButtonText("Select Files");
+                });
         try {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.file_chooser_fragment_container_framelayout, builder.build())

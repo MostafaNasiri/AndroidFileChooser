@@ -4,12 +4,9 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- List Item -->
-    <dimen name="list_item_padding">5dp</dimen>
-    <dimen name="list_item_icon_width">40dp</dimen>
-    <dimen name="list_item_name_left_margin">5dp</dimen>
+    <dimen name="list_item_icon_width">35dp</dimen>
 
     <!-- Chooser Fragment -->
-    <dimen name="prev_dir_width">30dp</dimen>
+    <dimen name="prev_dir_width">48dp</dimen>
     <dimen name="current_dir_left_margin">10dp</dimen>
-    <dimen name="items_list_top_margin">5dp</dimen>
 </resources>

@@ -1,5 +1,6 @@
 package ir.sohreco.androidfilechooser;
 
+import android.support.annotation.ColorRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -11,14 +12,19 @@ class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
     private List<Item> items, selectedItems;
     private ItemHolder.OnItemClickListener itemClickListener;
     private boolean multipleFileSelectionEnabled;
+    @ColorRes
+    private int listItemsTextColorResId;
 
-    ItemsAdapter(ItemHolder.OnItemClickListener itemClickListener, boolean multipleFileSelectionEnabled) {
+    ItemsAdapter(ItemHolder.OnItemClickListener itemClickListener,
+                 boolean multipleFileSelectionEnabled,
+                 @ColorRes int listItemsTextColorResId) {
         this.itemClickListener = itemClickListener;
         items = new ArrayList<>();
         this.multipleFileSelectionEnabled = multipleFileSelectionEnabled;
         if (multipleFileSelectionEnabled) {
             selectedItems = new ArrayList<>();
         }
+        this.listItemsTextColorResId = listItemsTextColorResId;
     }
 
     void setItems(List<Item> items) {
@@ -29,7 +35,9 @@ class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ItemHolder(inflater.inflate(R.layout.list_item, parent, false), itemClickListener);
+        return new ItemHolder(inflater.inflate(R.layout.list_item, parent, false),
+                itemClickListener,
+                listItemsTextColorResId);
     }
 
     @Override

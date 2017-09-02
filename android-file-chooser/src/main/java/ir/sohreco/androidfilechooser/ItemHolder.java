@@ -1,5 +1,7 @@
 package ir.sohreco.androidfilechooser;
 
+import android.support.annotation.ColorRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
@@ -19,13 +21,16 @@ class ItemHolder extends RecyclerView.ViewHolder {
         void onItemClick(Item item);
     }
 
-    ItemHolder(View itemView, OnItemClickListener itemClickListener) {
+    ItemHolder(View itemView, OnItemClickListener itemClickListener, @ColorRes int textColorResId) {
         super(itemView);
         this.itemClickListener = itemClickListener;
 
-        ivItemIcon = (ImageView) itemView.findViewById(R.id.item_icon_imageview);
-        tvItemName = (TextView) itemView.findViewById(R.id.item_name_textview);
-        cbFile = (CheckBox) itemView.findViewById(R.id.file_checkbox);
+        ivItemIcon = itemView.findViewById(R.id.item_icon_imageview);
+        tvItemName = itemView.findViewById(R.id.item_name_textview);
+        cbFile = itemView.findViewById(R.id.file_checkbox);
+
+        if (textColorResId != 0)
+            tvItemName.setTextColor(ContextCompat.getColor(itemView.getContext(), textColorResId));
     }
 
     void bind(final Item item) {

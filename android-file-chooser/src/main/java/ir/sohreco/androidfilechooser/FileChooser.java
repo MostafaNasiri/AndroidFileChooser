@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.io.File;
@@ -34,11 +35,12 @@ public class FileChooser extends Fragment
     private final static String KEY_INITIAL_DIRECTORY = "initialDirectory";
     private final static String KEY_SELECT_DIRECTORY_BUTTON_TEXT = "selectDirectoryButtonText";
     private final static String KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE = "selectDirectoryButtonTextSize";
-    private final static String KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_ID = "selectDirectoryButtonTextColorId";
-    private final static String KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_ID = "selectDirectoryButtonBackgroundId";
-    private final static String KEY_FILE_ICON_ID = "fileIconId";
-    private final static String KEY_DIRECTORY_ICON_ID = "directoryIconId";
-    private final static String KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID = "previousDirectoryButtonIconId";
+    private final static String KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_RES_ID = "selectDirectoryButtonTextColorResId";
+    private final static String KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_RES_ID = "selectDirectoryButtonBackgroundResId";
+    private final static String KEY_LIST_ITEMS_TEXT_COLOR_RES_ID = "listItemsTextColorResId";
+    private final static String KEY_FILE_ICON_RES_ID = "fileIconResId";
+    private final static String KEY_DIRECTORY_ICON_RES_ID = "directoryIconResId";
+    private final static String KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_RES_ID = "previousDirectoryButtonIconResId";
 
     public interface ChooserListener extends Serializable {
         /**
@@ -62,18 +64,21 @@ public class FileChooser extends Fragment
         // Optional parameters
         private String[] fileFormats;
         private boolean multipleFileSelectionEnabled;
-        private String selectDirectoryButtonText, initialDirectory;
-        @DrawableRes
-        private int fileIconId = R.drawable.ic_file;
-        @DrawableRes
-        private int directoryIconId = R.drawable.ic_directory;
-        @DrawableRes
-        private int previousDirectoryButtonIcon = R.drawable.ic_prev_dir;
-        @DrawableRes
-        private int selectDirectoryButtonBackgroundId;
-        @ColorRes
-        private int selectDirectoryButtonTextColorId;
+        private String initialDirectory;
+        private String selectDirectoryButtonText;
         private float selectDirectoryButtonTextSize;
+        @ColorRes
+        private int selectDirectoryButtonTextColorResId;
+        @DrawableRes
+        private int selectDirectoryButtonBackgroundResId;
+        @ColorRes
+        private int listItemsTextColorResId;
+        @DrawableRes
+        private int fileIconResId = R.drawable.ic_file;
+        @DrawableRes
+        private int directoryIconResId = R.drawable.ic_directory;
+        @DrawableRes
+        private int previousDirectoryButtonIconResId = R.drawable.ic_prev_dir;
 
         /**
          * Creates a builder for a FileChooser fragment.
@@ -190,14 +195,14 @@ public class FileChooser extends Fragment
          * @return This Builder object to allow for chaining of calls to set methods
          * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
          */
-        public Builder setSelectMultipleFilesButtonTextColor(@ColorRes int colorId) {
+        public Builder setSelectMultipleFilesButtonTextColor(@ColorRes int resId) {
             if (chooserType == ChooserType.DIRECTORY_CHOOSER)
                 throw new IllegalStateException("Can't set select multiple files button's text color when chooser type is DIRECTORY_CHOOSER.");
 
-            if (colorId <= 0)
-                throw new IllegalArgumentException("colorId can't be less than or equal to zero.");
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            selectDirectoryButtonTextColorId = colorId;
+            selectDirectoryButtonTextColorResId = resId;
             return this;
         }
 
@@ -207,14 +212,14 @@ public class FileChooser extends Fragment
          * @return This Builder object to allow for chaining of calls to set methods
          * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
          */
-        public Builder setSelectMultipleFilesButtonBackground(@DrawableRes int backgroundId) {
+        public Builder setSelectMultipleFilesButtonBackground(@DrawableRes int resId) {
             if (chooserType == ChooserType.DIRECTORY_CHOOSER)
                 throw new IllegalStateException("Can't set select multiple files button's background when chooser type is DIRECTORY_CHOOSER.");
 
-            if (backgroundId <= 0)
-                throw new IllegalArgumentException("backgroundId can't be less than or equal to zero.");
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            selectDirectoryButtonBackgroundId = backgroundId;
+            selectDirectoryButtonBackgroundResId = resId;
             return this;
         }
 
@@ -256,14 +261,14 @@ public class FileChooser extends Fragment
          * @return This Builder object to allow for chaining of calls to set methods
          * @throws IllegalStateException if you call this method when chooser type is FILE_CHOOSER
          */
-        public Builder setSelectDirectoryButtonTextColor(@ColorRes int colorId) {
+        public Builder setSelectDirectoryButtonTextColor(@ColorRes int resId) {
             if (chooserType == ChooserType.FILE_CHOOSER)
                 throw new IllegalStateException("Can't set select directory button's text color when chooser type is FILE_CHOOSER.");
 
-            if (colorId <= 0)
-                throw new IllegalArgumentException("colorId can't be less than or equal to zero.");
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            selectDirectoryButtonTextColorId = colorId;
+            selectDirectoryButtonTextColorResId = resId;
             return this;
         }
 
@@ -273,14 +278,27 @@ public class FileChooser extends Fragment
          * @return This Builder object to allow for chaining of calls to set methods
          * @throws IllegalStateException if you call this method when chooser type is FILE_CHOOSER
          */
-        public Builder setSelectDirectoryButtonBackground(@DrawableRes int backgroundId) {
+        public Builder setSelectDirectoryButtonBackground(@DrawableRes int resId) {
             if (chooserType == ChooserType.FILE_CHOOSER)
                 throw new IllegalStateException("Can't set select directory button's background when chooser type is FILE_CHOOSER.");
 
-            if (backgroundId <= 0)
-                throw new IllegalArgumentException("backgroundId can't be less than or equal to zero.");
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            selectDirectoryButtonBackgroundId = backgroundId;
+            selectDirectoryButtonBackgroundResId = resId;
+            return this;
+        }
+
+        /**
+         * Set the color of list item titles in this FileChooser.
+         *
+         * @return This Builder object to allow for chaining of calls to set methods
+         */
+        public Builder setListItemsTextColor(@ColorRes int resId) {
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
+
+            listItemsTextColorResId = resId;
             return this;
         }
 
@@ -291,14 +309,14 @@ public class FileChooser extends Fragment
          * @return This Builder object to allow for chaining of calls to set methods
          * @throws IllegalStateException if you call this method when chooser type is DIRECTORY_CHOOSER
          */
-        public Builder setFileIcon(@DrawableRes int iconId) {
+        public Builder setFileIcon(@DrawableRes int resId) {
             if (chooserType == ChooserType.DIRECTORY_CHOOSER)
                 throw new IllegalStateException("Can't set file icon when chooser type is DIRECTORY_CHOOSER.");
 
-            if (iconId <= 0)
-                throw new IllegalArgumentException("iconId can't be less than or equal to zero.");
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            fileIconId = iconId;
+            fileIconResId = resId;
             return this;
         }
 
@@ -308,11 +326,11 @@ public class FileChooser extends Fragment
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setDirectoryIcon(@DrawableRes int iconId) {
-            if (iconId <= 0)
-                throw new IllegalArgumentException("iconId can't be less than or equal to zero.");
+        public Builder setDirectoryIcon(@DrawableRes int resId) {
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            directoryIconId = iconId;
+            directoryIconResId = resId;
             return this;
         }
 
@@ -322,11 +340,11 @@ public class FileChooser extends Fragment
          *
          * @return This Builder object to allow for chaining of calls to set methods
          */
-        public Builder setPreviousDirectoryButtonIcon(@DrawableRes int iconId) {
-            if (iconId <= 0)
-                throw new IllegalArgumentException("iconId can't be less than or equal to zero.");
+        public Builder setPreviousDirectoryButtonIcon(@DrawableRes int resId) {
+            if (resId <= 0)
+                throw new IllegalArgumentException("resId can't be less than or equal to zero.");
 
-            previousDirectoryButtonIcon = iconId;
+            previousDirectoryButtonIconResId = resId;
             return this;
         }
 
@@ -353,31 +371,44 @@ public class FileChooser extends Fragment
             args.putString(KEY_INITIAL_DIRECTORY, initialDirectory);
             args.putString(KEY_SELECT_DIRECTORY_BUTTON_TEXT, selectDirectoryButtonText);
             args.putFloat(KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE, selectDirectoryButtonTextSize);
-            args.putInt(KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_ID, selectDirectoryButtonTextColorId);
-            args.putInt(KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_ID, selectDirectoryButtonBackgroundId);
-            args.putInt(KEY_FILE_ICON_ID, fileIconId);
-            args.putInt(KEY_DIRECTORY_ICON_ID, directoryIconId);
-            args.putInt(KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID, previousDirectoryButtonIcon);
+            args.putInt(KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_RES_ID, selectDirectoryButtonTextColorResId);
+            args.putInt(KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_RES_ID, selectDirectoryButtonBackgroundResId);
+            args.putInt(KEY_LIST_ITEMS_TEXT_COLOR_RES_ID, listItemsTextColorResId);
+            args.putInt(KEY_FILE_ICON_RES_ID, fileIconResId);
+            args.putInt(KEY_DIRECTORY_ICON_RES_ID, directoryIconResId);
+            args.putInt(KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_RES_ID, previousDirectoryButtonIconResId);
 
             fragment.setArguments(args);
             return fragment;
         }
     }
 
-    private Button btnPrevDirectory, btnSelectDirectory;
+    private ImageButton ibPrevDirectory;
+    private Button btnSelectDirectory;
     private RecyclerView rvItems;
     private TextView tvCurrentDirectory;
     private ChooserType chooserType;
     private ChooserListener chooserListener;
     private ItemsAdapter itemsAdapter;
+    private String currentDirectoryPath;
     private String[] fileFormats;
     private boolean multipleFileSelectionEnabled;
-    private String currentDirectoryPath, title, initialDirectory, selectDirectoryButtonText;
-    @DrawableRes
-    private int directoryIconId, fileIconId, previousDirectoryButtonIconId, selectDirectoryButtonBackgroundId;
-    @ColorRes
-    private int selectDirectoryButtonTextColorId;
+    private String initialDirectory;
+    private String selectDirectoryButtonText;
     private float selectDirectoryButtonTextSize;
+    @ColorRes
+    private int selectDirectoryButtonTextColorResId;
+    @DrawableRes
+    private int selectDirectoryButtonBackgroundResId;
+    @ColorRes
+    private int listItemsTextColorResId;
+    @DrawableRes
+    private int fileIconResId;
+    @DrawableRes
+    private int directoryIconResId;
+    @DrawableRes
+    private int previousDirectoryButtonIconResId;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -397,17 +428,18 @@ public class FileChooser extends Fragment
         if (chooserType == ChooserType.DIRECTORY_CHOOSER || multipleFileSelectionEnabled) {
             btnSelectDirectory.setVisibility(View.VISIBLE);
             btnSelectDirectory.setText(selectDirectoryButtonText);
-            if (selectDirectoryButtonBackgroundId != 0)
-                btnSelectDirectory.setBackgroundResource(selectDirectoryButtonBackgroundId);
-            if (selectDirectoryButtonTextColorId != 0)
+            if (selectDirectoryButtonBackgroundResId != 0)
+                btnSelectDirectory.setBackgroundResource(selectDirectoryButtonBackgroundResId);
+            if (selectDirectoryButtonTextColorResId != 0)
                 btnSelectDirectory.setTextColor(ContextCompat.getColor(getContext(),
-                        selectDirectoryButtonTextColorId));
+                        selectDirectoryButtonTextColorResId));
             if (selectDirectoryButtonTextSize != 0)
                 btnSelectDirectory.setTextSize(selectDirectoryButtonTextSize);
         }
-        btnPrevDirectory.setBackgroundResource(previousDirectoryButtonIconId);
+        ibPrevDirectory.setImageResource(previousDirectoryButtonIconResId);
+//        ibPrevDirectory.setBackgroundResource(previousDirectoryButtonIconResId);
 
-        itemsAdapter = new ItemsAdapter(this, multipleFileSelectionEnabled);
+        itemsAdapter = new ItemsAdapter(this, multipleFileSelectionEnabled, listItemsTextColorResId);
         rvItems.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvItems.setAdapter(itemsAdapter);
 
@@ -438,7 +470,7 @@ public class FileChooser extends Fragment
             if (chooserType == ChooserType.DIRECTORY_CHOOSER) {
                 chooserListener.onSelect(currentDirectoryPath);
             } else if (multipleFileSelectionEnabled) {
-                // Now select directory button acts as select files button.
+                // Now select directory button acts as select files button
                 chooserListener.onSelect(itemsAdapter.getSelectedItems());
             }
         }
@@ -473,7 +505,7 @@ public class FileChooser extends Fragment
 
         List<Item> items = new ArrayList<>();
         for (File f : files) {
-            int drawableId = f.isFile() ? fileIconId : directoryIconId;
+            int drawableId = f.isFile() ? fileIconResId : directoryIconResId;
             Drawable drawable = ContextCompat.getDrawable(getActivity().getApplicationContext(),
                     drawableId);
             items.add(new Item(f.getPath(), drawable));
@@ -485,30 +517,28 @@ public class FileChooser extends Fragment
 
     private void getGivenArguments() {
         Bundle args = getArguments();
-
         chooserType = (ChooserType) args.getSerializable(KEY_CHOOSER_TYPE);
         fileFormats = args.getStringArray(KEY_FILE_FORMATS);
         multipleFileSelectionEnabled = args.getBoolean(KEY_MULTIPLE_FILE_SELECTION_ENABLED);
         initialDirectory = args.getString(KEY_INITIAL_DIRECTORY);
-
         selectDirectoryButtonText = args.getString(KEY_SELECT_DIRECTORY_BUTTON_TEXT);
         selectDirectoryButtonTextSize = args.getFloat(KEY_SELECT_DIRECTORY_BUTTON_TEXT_SIZE);
-        selectDirectoryButtonTextColorId = args.getInt(KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_ID);
-        selectDirectoryButtonBackgroundId = args.getInt(KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_ID);
-
-        fileIconId = args.getInt(KEY_FILE_ICON_ID);
-        directoryIconId = args.getInt(KEY_DIRECTORY_ICON_ID);
-        previousDirectoryButtonIconId = args.getInt(KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_ID);
+        selectDirectoryButtonTextColorResId = args.getInt(KEY_SELECT_DIRECTORY_BUTTON_TEXT_COLOR_RES_ID);
+        selectDirectoryButtonBackgroundResId = args.getInt(KEY_SELECT_DIRECTORY_BUTTON_BACKGROUND_RES_ID);
+        listItemsTextColorResId = args.getInt(KEY_LIST_ITEMS_TEXT_COLOR_RES_ID);
+        fileIconResId = args.getInt(KEY_FILE_ICON_RES_ID);
+        directoryIconResId = args.getInt(KEY_DIRECTORY_ICON_RES_ID);
+        previousDirectoryButtonIconResId = args.getInt(KEY_PREVIOUS_DIRECTORY_BUTTON_ICON_RES_ID);
     }
 
     private void setListeners() {
-        btnPrevDirectory.setOnClickListener(this);
+        ibPrevDirectory.setOnClickListener(this);
         btnSelectDirectory.setOnClickListener(this);
     }
 
     private void findViews(View v) {
         rvItems = v.findViewById(R.id.items_recyclerview);
-        btnPrevDirectory = v.findViewById(R.id.previous_dir_imagebutton);
+        ibPrevDirectory = v.findViewById(R.id.previous_dir_imagebutton);
         btnSelectDirectory = v.findViewById(R.id.select_dir_button);
         tvCurrentDirectory = v.findViewById(R.id.current_dir_textview);
     }
