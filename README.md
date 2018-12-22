@@ -1,4 +1,4 @@
-<center><h2>This library is no longer maintained.</h2>
+<h1>This library is no longer maintained.</h1>
     
 <h1>AndroidFileChooser</h1>
 
