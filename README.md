@@ -1,5 +1,3 @@
-<h1>This library is no longer maintained.</h1>
-    
 <h1>AndroidFileChooser</h1>
 
 <p align="center">
